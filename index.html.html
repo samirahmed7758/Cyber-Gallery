@@ -1,0 +1,385 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Cyber Gallery - Security Simulations</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Courier New', monospace;
+            background: linear-gradient(135deg, #0a0a1a 0%, #1a1a3e 50%, #0f0f2e 100%);
+            color: #00ff00;
+            min-height: 100vh;
+            overflow-x: hidden;
+            position: relative;
+        }
+
+        /* Animated background grid */
+        body::before {
+            content: '';
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-image: 
+                linear-gradient(rgba(0, 255, 255, 0.03) 1px, transparent 1px),
+                linear-gradient(90deg, rgba(0, 255, 255, 0.03) 1px, transparent 1px);
+            background-size: 50px 50px;
+            animation: gridMove 20s linear infinite;
+            pointer-events: none;
+            z-index: 0;
+        }
+
+        @keyframes gridMove {
+            0% {
+                transform: translate(0, 0);
+            }
+            100% {
+                transform: translate(50px, 50px);
+            }
+        }
+
+        /* Floating particles */
+        .particle {
+            position: fixed;
+            width: 2px;
+            height: 2px;
+            background: #00ffff;
+            border-radius: 50%;
+            pointer-events: none;
+            opacity: 0.5;
+            animation: float 15s infinite;
+            z-index: 1;
+        }
+
+        @keyframes float {
+            0%, 100% {
+                transform: translateY(0) translateX(0);
+                opacity: 0;
+            }
+            10% {
+                opacity: 0.5;
+            }
+            90% {
+                opacity: 0.5;
+            }
+            100% {
+                transform: translateY(-100vh) translateX(50px);
+                opacity: 0;
+            }
+        }
+
+        .container {
+            position: relative;
+            z-index: 2;
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 40px 20px;
+        }
+
+        header {
+            text-align: center;
+            margin-bottom: 60px;
+            padding: 40px 20px;
+            background: rgba(0, 255, 255, 0.05);
+            border: 2px solid rgba(0, 255, 255, 0.3);
+            border-radius: 10px;
+            box-shadow: 0 0 30px rgba(0, 255, 255, 0.2);
+            position: relative;
+            overflow: hidden;
+        }
+
+        header::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background: linear-gradient(
+                45deg,
+                transparent,
+                rgba(0, 255, 255, 0.1),
+                transparent
+            );
+            animation: scan 3s infinite;
+        }
+
+        @keyframes scan {
+            0% {
+                transform: translateX(-100%) translateY(-100%);
+            }
+            100% {
+                transform: translateX(100%) translateY(100%);
+            }
+        }
+
+        h1 {
+            font-size: 4rem;
+            color: #00ffff;
+            text-shadow: 0 0 20px rgba(0, 255, 255, 0.8),
+                         0 0 40px rgba(0, 255, 255, 0.5);
+            margin-bottom: 10px;
+            letter-spacing: 5px;
+            position: relative;
+            z-index: 1;
+        }
+
+        .subtitle {
+            font-size: 1.2rem;
+            color: #00ff00;
+            text-shadow: 0 0 10px rgba(0, 255, 0, 0.6);
+            letter-spacing: 2px;
+            position: relative;
+            z-index: 1;
+        }
+
+        .gallery-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(400px, 1fr));
+            gap: 30px;
+            margin-bottom: 40px;
+        }
+
+        .simulation-card {
+            background: rgba(10, 10, 30, 0.8);
+            border: 2px solid rgba(0, 255, 255, 0.4);
+            border-radius: 15px;
+            padding: 30px;
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+            box-shadow: 0 5px 25px rgba(0, 255, 255, 0.2);
+        }
+
+        .simulation-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(
+                90deg,
+                transparent,
+                rgba(0, 255, 255, 0.2),
+                transparent
+            );
+            transition: left 0.5s;
+        }
+
+        .simulation-card:hover::before {
+            left: 100%;
+        }
+
+        .simulation-card:hover {
+            transform: translateY(-10px);
+            border-color: #00ffff;
+            box-shadow: 0 10px 40px rgba(0, 255, 255, 0.4);
+        }
+
+        .card-header {
+            display: flex;
+            align-items: center;
+            margin-bottom: 20px;
+            position: relative;
+            z-index: 1;
+        }
+
+        .card-icon {
+            font-size: 2rem;
+            margin-right: 15px;
+            color: #00ffff;
+            text-shadow: 0 0 10px rgba(0, 255, 255, 0.8);
+        }
+
+        .card-title {
+            font-size: 1.8rem;
+            color: #00ffff;
+            text-shadow: 0 0 10px rgba(0, 255, 255, 0.5);
+        }
+
+        .card-description {
+            color: #00ff00;
+            margin-bottom: 20px;
+            line-height: 1.6;
+            position: relative;
+            z-index: 1;
+        }
+
+        .launch-btn {
+            display: inline-block;
+            padding: 12px 30px;
+            background: linear-gradient(45deg, rgba(0, 255, 255, 0.2), rgba(0, 255, 0, 0.2));
+            border: 2px solid #00ffff;
+            color: #00ffff;
+            text-decoration: none;
+            border-radius: 5px;
+            font-weight: bold;
+            transition: all 0.3s ease;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            position: relative;
+            z-index: 1;
+            overflow: hidden;
+        }
+
+        .launch-btn::before {
+            content: '';
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            width: 0;
+            height: 0;
+            background: rgba(0, 255, 255, 0.3);
+            border-radius: 50%;
+            transform: translate(-50%, -50%);
+            transition: width 0.5s, height 0.5s;
+        }
+
+        .launch-btn:hover::before {
+            width: 300px;
+            height: 300px;
+        }
+
+        .launch-btn:hover {
+            background: rgba(0, 255, 255, 0.3);
+            box-shadow: 0 0 20px rgba(0, 255, 255, 0.6);
+            transform: scale(1.05);
+        }
+
+        .launch-btn span {
+            position: relative;
+            z-index: 1;
+        }
+
+        .warning-banner {
+            background: rgba(255, 0, 0, 0.1);
+            border: 2px solid rgba(255, 0, 0, 0.5);
+            border-radius: 10px;
+            padding: 20px;
+            margin-top: 40px;
+            text-align: center;
+        }
+
+        .warning-banner h3 {
+            color: #ff0000;
+            text-shadow: 0 0 10px rgba(255, 0, 0, 0.8);
+            margin-bottom: 10px;
+        }
+
+        .warning-banner p {
+            color: #ffaa00;
+        }
+
+        footer {
+            text-align: center;
+            margin-top: 60px;
+            padding: 20px;
+            color: rgba(0, 255, 255, 0.6);
+            border-top: 1px solid rgba(0, 255, 255, 0.2);
+        }
+
+        @media (max-width: 768px) {
+            h1 {
+                font-size: 2.5rem;
+            }
+            
+            .gallery-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>CYBER GALLERY</h1>
+            <p class="subtitle">◢ PHISHING SIMULATION TRAINING ◣</p>
+        </header>
+
+        <div class="gallery-grid">
+            <div class="simulation-card">
+                <div class="card-header">
+                    <span class="card-icon">🎣</span>
+                    <h2 class="card-title">Phishing Simulation #1</h2>
+                </div>
+                <p class="card-description">
+                    First-generation phishing simulation. Test your ability to identify malicious emails and phishing attempts. Learn to recognize common social engineering tactics.
+                </p>
+                <a href="https://samirahmed7758.github.io/Phishing-Simulation/" target="_blank" class="launch-btn">
+                    <span>▶ LAUNCH SIMULATION</span>
+                </a>
+            </div>
+
+            <div class="simulation-card">
+                <div class="card-header">
+                    <span class="card-icon">🔒</span>
+                    <h2 class="card-title">Phishing Simulation V2</h2>
+                </div>
+                <p class="card-description">
+                    Enhanced phishing detection training. Features advanced scenarios with sophisticated attack vectors. Improve your security awareness skills.
+                </p>
+                <a href="https://samirahmed7758.github.io/Phishing-Simulation-V2/" target="_blank" class="launch-btn">
+                    <span>▶ LAUNCH SIMULATION</span>
+                </a>
+            </div>
+
+            <div class="simulation-card">
+                <div class="card-header">
+                    <span class="card-icon">🛡️</span>
+                    <h2 class="card-title">Phishing Simulation V3</h2>
+                </div>
+                <p class="card-description">
+                    Latest iteration of phishing awareness training. Master advanced threat detection with cutting-edge simulation scenarios and real-world examples.
+                </p>
+                <a href="https://samirahmed7758.github.io/Phishing-Simulation-V3/" target="_blank" class="launch-btn">
+                    <span>▶ LAUNCH SIMULATION</span>
+                </a>
+            </div>
+        </div>
+
+        <div class="warning-banner">
+            <h3>⚠️ EDUCATIONAL PURPOSE ONLY ⚠️</h3>
+            <p>These simulations are designed for cybersecurity awareness training. Use responsibly and ethically.</p>
+        </div>
+
+        <footer>
+            <p>[ SYSTEM STATUS: ACTIVE ] | [ ENCRYPTION: ENABLED ] | [ SECURITY LEVEL: MAXIMUM ]</p>
+        </footer>
+    </div>
+
+    <script>
+        // Create floating particles
+        for (let i = 0; i < 30; i++) {
+            const particle = document.createElement('div');
+            particle.className = 'particle';
+            particle.style.left = Math.random() * 100 + '%';
+            particle.style.animationDelay = Math.random() * 15 + 's';
+            particle.style.animationDuration = (Math.random() * 10 + 10) + 's';
+            document.body.appendChild(particle);
+        }
+
+        // Add glitch effect to title on hover
+        const title = document.querySelector('h1');
+        title.addEventListener('mouseenter', () => {
+            let glitchCount = 0;
+            const glitchInterval = setInterval(() => {
+                title.style.transform = `translate(${Math.random() * 4 - 2}px, ${Math.random() * 4 - 2}px)`;
+                glitchCount++;
+                if (glitchCount > 5) {
+                    clearInterval(glitchInterval);
+                    title.style.transform = 'translate(0, 0)';
+                }
+            }, 50);
+        });
+    </script>
+</body>
+</html>
